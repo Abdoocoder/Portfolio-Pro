@@ -1,6 +1,6 @@
 import { initializeApp, getApps, getApp, type FirebaseApp, type FirebaseOptions } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { getAuth, GoogleAuthProvider, type Auth } from 'firebase/auth';
+import { getFirestore, type Firestore } from 'firebase/firestore';
 
 // التحقق من وجود متغيرات البيئة المطلوبة
 const requiredEnvVars = [
@@ -37,7 +37,9 @@ try {
 }
 
 // تهيئة خدمات Firebase مع التحقق من الأخطاء
-let auth, db, googleProvider;
+let auth: Auth;
+let db: Firestore;
+let googleProvider: GoogleAuthProvider;
 
 try {
   auth = getAuth(app);

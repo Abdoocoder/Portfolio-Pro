@@ -1,3 +1,4 @@
+
 'use client';
 
 import './globals.css';
@@ -8,7 +9,7 @@ import { SiteDataProvider } from '@/contexts/SiteDataContext';
 import { useLanguage } from '@/hooks/use-language';
 import type { ReactNode } from 'react';
 
-const BodyWrapper = ({ children }: { children: ReactNode }) => {
+const RootLayoutComponent = ({ children }: { children: ReactNode }) => {
   const { lang, dir } = useLanguage();
 
   return (
@@ -27,7 +28,14 @@ const BodyWrapper = ({ children }: { children: ReactNode }) => {
           }
         `}</style>
       </head>
-      <body className="antialiased font-body">{children}</body>
+      <body className="antialiased font-body">
+        <AuthProvider>
+            <SiteDataProvider>
+                {children}
+                <Toaster />
+            </SiteDataProvider>
+        </AuthProvider>
+      </body>
     </html>
   );
 };
@@ -39,14 +47,9 @@ export default function RootLayout({
 }>) {
   return (
     <LanguageProvider>
-      <AuthProvider>
-        <SiteDataProvider>
-          <BodyWrapper>
+        <RootLayoutComponent>
             {children}
-            <Toaster />
-          </BodyWrapper>
-        </SiteDataProvider>
-      </AuthProvider>
+        </RootLayoutComponent>
     </LanguageProvider>
   );
 }

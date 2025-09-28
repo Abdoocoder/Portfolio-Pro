@@ -12,8 +12,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ExternalLink, Github, Mail, Download, Send, Briefcase, GraduationCap } from 'lucide-react';
-import { useFormState, useFormStatus } from 'react-dom';
-import { useEffect, useRef } from 'react';
+import { useFormStatus } from 'react-dom';
+import { useEffect, useRef, useActionState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { submitContactForm } from '@/app/actions';
 
@@ -264,7 +264,7 @@ function ContactSection() {
     const formRef = useRef<HTMLFormElement>(null);
 
     const initialState: { message: string | null; errors?: any, success?: boolean } = { message: null, errors: {}, success: false };
-    const [state, dispatch] = useFormState(submitContactForm, initialState);
+    const [state, dispatch] = useActionState(submitContactForm, initialState);
 
     useEffect(() => {
         if (state.message) {

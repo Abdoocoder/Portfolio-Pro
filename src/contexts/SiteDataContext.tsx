@@ -1,9 +1,11 @@
+
 'use client';
 
 import type { ReactNode } from 'react';
-import { createContext, useEffect, useState } from 'react';
+import { createContext, useEffect, useState, useContext } from 'react';
 import { collection, doc, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { AuthContext } from './AuthContext';
 import type {
   Education,
   Experience,
@@ -26,6 +28,7 @@ interface SiteDataContextType {
 export const SiteDataContext = createContext<SiteDataContextType | undefined>(undefined);
 
 export function SiteDataProvider({ children }: { children: ReactNode }) {
+  const { isAdmin } = useContext(AuthContext) ?? { isAdmin: false };
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -57,20 +60,24 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
         const educationData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Education[];
         setEducation(educationData);
       }),
-      onSnapshot(query(collection(db, 'messages'), orderBy('createdAt', 'desc')), 
+    ];
+
+    if (isAdmin) {
+      const messagesUnsub = onSnapshot(query(collection(db, 'messages'), orderBy('createdAt', 'desc')), 
         (snapshot) => {
           const messagesData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Message[];
           setMessages(messagesData);
         },
         (error) => {
-          // This callback handles permission errors gracefully.
-          console.error("Firestore permission denied on 'messages' collection. This is expected for non-admin users.");
-          setMessages([]); // Ensure messages are cleared on error.
+          console.error("Error fetching messages:", error);
+          setMessages([]);
         }
-      ),
-    ];
+      );
+      unsubscribers.push(messagesUnsub);
+    } else {
+      setMessages([]);
+    }
 
-    // A delay to simulate loading
     const timer = setTimeout(() => {
         setLoading(false);
     }, 1000);
@@ -79,7 +86,7 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
       unsubscribers.forEach(unsub => unsub());
       clearTimeout(timer);
     };
-  }, []);
+  }, [isAdmin]);
 
   return (
     <SiteDataContext.Provider value={{ settings, projects, skills, experience, education, messages, loading }}>

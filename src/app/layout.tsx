@@ -29,12 +29,10 @@ const RootLayoutComponent = ({ children }: { children: ReactNode }) => {
         `}</style>
       </head>
       <body className="antialiased font-body">
-        <AuthProvider>
-            <SiteDataProvider>
-                {children}
-                <Toaster />
-            </SiteDataProvider>
-        </AuthProvider>
+        <SiteDataProvider>
+            {children}
+            <Toaster />
+        </SiteDataProvider>
       </body>
     </html>
   );
@@ -47,9 +45,11 @@ export default function RootLayout({
 }>) {
   return (
     <LanguageProvider>
+      <AuthProvider>
         <RootLayoutComponent>
             {children}
         </RootLayoutComponent>
+      </AuthProvider>
     </LanguageProvider>
   );
 }

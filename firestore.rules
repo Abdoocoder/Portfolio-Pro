@@ -1,0 +1,46 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check if the user is an administrator
+    function isAdmin() {
+      return request.auth != null 
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid)) 
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Public content collections
+    match /settings/{docId} {
+        allow read: if true;
+        allow write: if isAdmin();
+    }
+    match /projects/{docId} {
+        allow read: if true;
+        allow write: if isAdmin();
+    }
+    match /skills/{docId} {
+        allow read: if true;
+        allow write: if isAdmin();
+    }
+    match /experience/{docId} {
+        allow read: if true;
+        allow write: if isAdmin();
+    }
+    match /education/{docId} {
+        allow read: if true;
+        allow write: if isAdmin();
+    }
+
+    // Contact form messages
+    match /messages/{msgId} {
+      allow create: if true; // Anyone can send a message
+      allow list, read, update, delete: if isAdmin();
+    }
+    
+    // Admin user roles
+    match /admins/{adminId} {
+      allow list, read: if isAdmin();
+      // Admins should be managed manually in the Firebase Console for security
+      allow create, update, delete: if false;
+    }
+  }
+}

@@ -160,3 +160,4 @@ You can deploy this project to any platform that supports Next.js, such as Verce
 -   **Skills, Experience, Education**: Manage the respective sections of your portfolio.
 -   **Messages**: View and manage messages sent through the contact form.
 -   **Generate Metadata**: Use the AI-powered tool within the Settings or Projects forms to generate SEO-friendly metadata.
+# Portfolio-Pro

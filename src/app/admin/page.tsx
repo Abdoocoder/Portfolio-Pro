@@ -6,9 +6,8 @@ import { Briefcase, Lightbulb, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminDashboard() {
-    const { projects, skills, loading } = useSiteData();
-    // In a real app, you would fetch unread messages count separately
-    const unreadMessages = 5;
+    const { projects, skills, loading, messages } = useSiteData();
+    const unreadMessages = messages.filter(m => !m.handled).length;
 
     const stats = [
         {

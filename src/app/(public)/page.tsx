@@ -33,10 +33,10 @@ function HeroSection() {
                     className="rounded-full mx-auto mb-6 border-4 border-primary/20 shadow-lg"
                     data-ai-hint="professional portrait"
                 />
-                <h1 className="text-4xl md:text-6xl font-bold font-headline mb-4 animate-fade-in-down">
+                <h1 className="text-4xl md:text-6xl font-bold font-headline mb-4 animate-fade-in-up">
                     {t(settings, 'hero_title')}
                 </h1>
-                <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto animate-fade-in-up">
+                <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto animate-fade-in-down">
                     {t(settings, 'tagline')}
                 </p>
                 <div className="flex gap-4 justify-center mt-8">
@@ -198,7 +198,7 @@ function ExperienceSection() {
                             </p>
                             <p className="mb-4 text-base font-normal text-muted-foreground">{t(exp, 'description')}</p>
                         </div>
-                    ))}
+                    ))}\
                 </div>
             </div>
         </section>
@@ -253,7 +253,7 @@ function SubmitButton({ text_ar, text_en }: { text_ar: string; text_en: string }
           <Send className="me-2 h-4 w-4" />
           {lang === 'en' ? text_en : text_ar}
         </>
-      )}
+      )}\
     </Button>
   );
 }

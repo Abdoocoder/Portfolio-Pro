@@ -7,6 +7,7 @@ import { db } from '@/lib/firebase';
 import type {
   Education,
   Experience,
+  Message,
   Project,
   SiteSettings,
   Skill,
@@ -18,6 +19,7 @@ interface SiteDataContextType {
   skills: Skill[];
   experience: Experience[];
   education: Education[];
+  messages: Message[];
   loading: boolean;
 }
 
@@ -29,6 +31,7 @@ export const SiteDataProvider = ({ children }: { children: ReactNode }) => {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [experience, setExperience] = useState<Experience[]>([]);
   const [education, setEducation] = useState<Education[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -59,6 +62,11 @@ export const SiteDataProvider = ({ children }: { children: ReactNode }) => {
       unsubscribes.push(onSnapshot(educationQuery, (snapshot) => {
         setEducation(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Education)));
       }));
+
+      const messagesQuery = query(collection(db, 'messages'), orderBy('createdAt', 'desc'));
+      unsubscribes.push(onSnapshot(messagesQuery, (snapshot) => {
+          setMessages(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Message)));
+      }));
       
     } catch (error) {
         console.error("Error attaching Firestore listeners:", error);
@@ -71,7 +79,7 @@ export const SiteDataProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <SiteDataContext.Provider value={{ settings, projects, skills, experience, education, loading }}>
+    <SiteDataContext.Provider value={{ settings, projects, skills, experience, education, messages, loading }}>
       {children}
     </SiteDataContext.Provider>
   );

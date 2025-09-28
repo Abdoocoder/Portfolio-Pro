@@ -8,9 +8,6 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import { SiteDataProvider } from '@/contexts/SiteDataContext';
 import { useLanguage } from '@/hooks/use-language';
 import type { ReactNode } from 'react';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const RootLayoutComponent = ({ children }: { children: ReactNode }) => {
   const { lang, dir } = useLanguage();

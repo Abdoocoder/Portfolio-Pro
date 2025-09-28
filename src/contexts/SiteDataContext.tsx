@@ -25,7 +25,7 @@ interface SiteDataContextType {
 
 export const SiteDataContext = createContext<SiteDataContextType | undefined>(undefined);
 
-export const SiteDataProvider = ({ children }: { children: ReactNode }) => {
+export function SiteDataProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -35,47 +35,50 @@ export const SiteDataProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribes: (() => void)[] = [];
     setLoading(true);
 
-    try {
-      unsubscribes.push(onSnapshot(doc(db, 'settings', 'site'), (doc) => {
+    const unsubscribers = [
+      onSnapshot(doc(db, 'settings', 'site'), (doc) => {
         setSettings(doc.data() as SiteSettings);
-      }));
+      }),
+      onSnapshot(query(collection(db, 'projects'), orderBy('order', 'asc')), (snapshot) => {
+        const projectsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Project[];
+        setProjects(projectsData);
+      }),
+      onSnapshot(query(collection(db, 'skills'), orderBy('order', 'asc')), (snapshot) => {
+        const skillsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Skill[];
+        setSkills(skillsData);
+      }),
+      onSnapshot(query(collection(db, 'experience'), orderBy('from', 'desc')), (snapshot) => {
+        const experienceData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Experience[];
+        setExperience(experienceData);
+      }),
+      onSnapshot(query(collection(db, 'education'), orderBy('year', 'desc')), (snapshot) => {
+        const educationData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Education[];
+        setEducation(educationData);
+      }),
+      onSnapshot(query(collection(db, 'messages'), orderBy('createdAt', 'desc')), 
+        (snapshot) => {
+          const messagesData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Message[];
+          setMessages(messagesData);
+        },
+        (error) => {
+          // This callback handles permission errors gracefully.
+          console.error("Firestore permission denied on 'messages' collection. This is expected for non-admin users.");
+          setMessages([]); // Ensure messages are cleared on error.
+        }
+      ),
+    ];
 
-      const projectsQuery = query(collection(db, 'projects'), orderBy('order', 'asc'));
-      unsubscribes.push(onSnapshot(projectsQuery, (snapshot) => {
-        setProjects(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Project)));
-      }));
-      
-      const skillsQuery = query(collection(db, 'skills'), orderBy('order', 'asc'));
-      unsubscribes.push(onSnapshot(skillsQuery, (snapshot) => {
-        setSkills(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Skill)));
-      }));
+    // A delay to simulate loading
+    const timer = setTimeout(() => {
+        setLoading(false);
+    }, 1000);
 
-      const experienceQuery = query(collection(db, 'experience'), orderBy('order', 'asc'));
-      unsubscribes.push(onSnapshot(experienceQuery, (snapshot) => {
-        setExperience(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Experience)));
-      }));
-
-      const educationQuery = query(collection(db, 'education'), orderBy('order', 'asc'));
-      unsubscribes.push(onSnapshot(educationQuery, (snapshot) => {
-        setEducation(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Education)));
-      }));
-
-      const messagesQuery = query(collection(db, 'messages'), orderBy('createdAt', 'desc'));
-      unsubscribes.push(onSnapshot(messagesQuery, (snapshot) => {
-          setMessages(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Message)));
-      }));
-      
-    } catch (error) {
-        console.error("Error attaching Firestore listeners:", error);
-    } finally {
-        // A small delay to allow initial data to load
-        setTimeout(() => setLoading(false), 1000);
-    }
-
-    return () => unsubscribes.forEach(unsub => unsub());
+    return () => {
+      unsubscribers.forEach(unsub => unsub());
+      clearTimeout(timer);
+    };
   }, []);
 
   return (
@@ -83,4 +86,4 @@ export const SiteDataProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </SiteDataContext.Provider>
   );
-};
+}

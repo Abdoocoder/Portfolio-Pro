@@ -10,8 +10,8 @@ import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
 import { Code, Download, Github, Mail, Linkedin, Twitter } from 'lucide-react';
 
 function Header() {
-  const { t, settings } = useSiteData();
-  const { lang, dir } = useLanguage();
+  const { settings } = useSiteData();
+  const { lang, t } = useLanguage();
 
   const navLinks = [
     { id: 'about', label_en: 'About', label_ar: 'عني' },
